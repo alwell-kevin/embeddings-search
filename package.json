@@ -1,0 +1,20 @@
+{
+  "name": "embeddings-search",
+  "version": "1.0.0",
+  "description": "question_answering_using_embeddings https://cookbook.openai.com/examples/question_answering_using_embeddings",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "compute-cosine-similarity": "^1.1.0",
+    "csv-parser": "^3.0.0",
+    "dotenv": "^16.4.5",
+    "fs": "^0.0.1-security",
+    "openai": "^4.65.0"
+  }
+}
