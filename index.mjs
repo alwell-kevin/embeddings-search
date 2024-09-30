@@ -11,17 +11,15 @@ const client = new OpenAI({
   apiKey: process.env['OPENAI_API_KEY'], // This is the default and can be omitted
 });
 
-let exampleQuery = {"text":"curling gold medal", "embedding":[]}
-
 //Convert Query into OpenAI embedding using the openai embeddings api
-async function convertQueryToEmbedding(exampleQuery) {
+async function convertQueryToEmbedding(query) {
 
     const response = await client.embeddings.create({
-        model: "text-embedding-3-small",
-        input: exampleQuery.text
+        model: "text-embedding-ada-002",
+        input: query.text
       });
 
-      exampleQuery.embedding = response.data[0].embedding
+      query.embedding = response.data[0].embedding
 
       console.log(response.data);
 
@@ -62,8 +60,8 @@ async function similarityCheck(query, data) {
   // Sort by similarity score in descending order
   results.sort((a, b) => b.similarityScore - a.similarityScore);
 
-  // Return the top 5 most similar results
-  return results.slice(0, 5);
+  // Return the top most similar results
+  return results.slice(0, 10);
 }
 
 // Prompt OpenAi for a completion using the similarity results
@@ -76,7 +74,7 @@ async function sendContextualizedPrompt(userInput, similarityResults) {
   });
 
   const response = await client.chat.completions.create({
-    model: 'gpt-3.5-turbo', // or use 'gpt-4' if available in your plan
+    model: 'gpt-4',
     messages: [
       { role: 'system', content: 'You are a helpful assistant.' },
       { role: 'user', content: promptInProgress },
@@ -95,11 +93,12 @@ async function sendContextualizedPrompt(userInput, similarityResults) {
 (async () => {
     console.log('Starting CSV processing');
   try {
+    let exampleQuery = {"text":"Which athletes won the gold medal in curling at the 2022 Winter Olympics?", "embedding":[]};
     const query = await convertQueryToEmbedding(exampleQuery);
     const data = await processCSV('./winter_olympics_2022.csv');
-    const top5Results = await similarityCheck(exampleQuery, data);
-    console.log(top5Results);
-    await sendContextualizedPrompt(exampleQuery, top5Results);
+    const topResults = await similarityCheck(exampleQuery, data);
+    console.log(topResults);
+    await sendContextualizedPrompt(exampleQuery, topResults);
   } catch (error) {
     console.error('Error processing CSV file:', error);
   }
